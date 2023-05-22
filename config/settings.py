@@ -63,10 +63,15 @@ SYSTEM_APPS = [
 
 # 우리가 설치하는것들
 CUSTOM_APPS = [
-    # "common.apps.CommonConfig",
     "users.apps.UsersConfig",
+    "rooms.apps.RoomsConfig",
+    "experiences.apps.ExperiencesConfig",
+    "categories.apps.CategoriesConfig",
+    "photos.apps.PhotosConfig",
+    "wishlists.apps.WishlistsConfig",
+    "reviews.apps.ReviewsConfig",
+    "common.apps.CommonConfig",
     # "products.apps.ProductsConfig",
-    # "reviews.apps.ReviewsConfig",
     # "coupons.apps.CouponsConfig",
     # "settingsOption.apps.SettingsoptionConfig",
     # "feedbacks.apps.FeedbacksConfig",
@@ -75,8 +80,6 @@ CUSTOM_APPS = [
     # "orders.apps.OrdersConfig",
     # "soldProducts.apps.SoldproductsConfig",
     # "carts.apps.CartsConfig",
-    # "photos.apps.PhotosConfig",
-    # "wishlists.apps.WishlistsConfig",
     # "orderHistory.apps.OrderhistoryConfig",
 ]
 
