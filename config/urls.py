@@ -23,7 +23,7 @@ from drf_yasg.views import get_schema_view as swagger_get_schema_view
 # for swagger
 schema_view = swagger_get_schema_view(
     openapi.Info(
-        title="Alex Team's Shopping Mall Project APIS",
+        title="Alex Team's BlankHouse Project APIS",
         default_version="1.0.0",
         description="API documentation. Below are all of the possible response codes with a short description.",
     ),
@@ -33,6 +33,8 @@ schema_view = swagger_get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/v1/users/", include("users.urls")),
+    path("api/v1/photos/", include("photos.urls")),
     path(
         "api/v1/swagger/schema/",
         schema_view.with_ui("swagger", cache_timeout=0),

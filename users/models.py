@@ -21,16 +21,13 @@ class User(AbstractUser):
         USD = "usd", "Dollar"
 
     password = models.CharField(max_length=128)
-    avatar = models.FileField(
-        upload_to="media/", validators=[validate_file_size], blank=True, null=True
-    )
 
     # username 은 AbstractUser 상속받은곳에서 가져올것임
     email = models.CharField(max_length=150, blank=True, null=True)
     balance = models.PositiveIntegerField(default=0)
     address = models.CharField(max_length=150, blank=True, null=True)
-    emergency_contact = models.CharField(max_length=11, blank=True, null=True)
-    phone_number = models.CharField(max_length=11, blank=True, null=True)
+    emergency_contact = models.CharField(max_length=30, blank=True, null=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
 
     is_host = models.BooleanField(default=False)
     born_year = models.CharField(max_length=30, blank=True, null=True)
@@ -39,14 +36,14 @@ class User(AbstractUser):
     hobby = models.CharField(max_length=50, blank=True, null=True)
 
     gender = models.CharField(
-        max_length=10,
-        choices=GenderChoices.choices,
+        max_length=10, choices=GenderChoices.choices, blank=True, null=True
     )
     language = models.CharField(
-        max_length=2,
-        choices=LanguageChoices.choices,
+        max_length=2, choices=LanguageChoices.choices, blank=True, null=True
     )
     currency = models.CharField(
-        max_length=5,
-        choices=CurrencyChoices.choices,
+        max_length=5, choices=CurrencyChoices.choices, blank=True, null=True
     )
+
+    # def description(self):
+    #     return self.photos.picture.url
