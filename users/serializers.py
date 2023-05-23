@@ -4,6 +4,15 @@ from .models import User
 from photos.serializers import SaveUserAvatarSerializer
 
 
+class AddUserSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "username",
+            "password",
+        )
+
+
 class PrivateUserSerializer(ModelSerializer):
     avatar = SaveUserAvatarSerializer(read_only=True)
 

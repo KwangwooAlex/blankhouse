@@ -86,7 +86,7 @@ class Users(GenericAPIView):
     def get_serializer_class(self, *args, **kwargs):
         if self.request.method == "GET":
             return serializers.AllUserSerializer
-        return serializers.PrivateUserSerializer
+        return serializers.AddUserSerializer
 
     def get_object(self):
         return User.objects.all()
@@ -105,7 +105,7 @@ class Users(GenericAPIView):
         password = request.data.get("password")
         if not password:
             raise ParseError
-        serializer = serializers.PrivateUserSerializer(data=request.data)
+        serializer = serializers.AddUserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             user.set_password(password)  # 패스워드 관련 이것은 정해진것이다 장고 문서참고!
