@@ -61,7 +61,7 @@ class Room(CommonModel):
         "categories.Category",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.SET_NULL,  # 카테고리가 삭제되도 room은 삭제되지 않음, 반대는 casacade
         related_name="rooms",
     )
 

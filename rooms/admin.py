@@ -19,6 +19,7 @@ class RoomAdmin(admin.ModelAdmin):
     actions = (reset_prices,)
 
     list_display = (
+        "pk",
         "name",
         "price",
         "house_type",
