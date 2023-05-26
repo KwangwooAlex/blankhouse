@@ -38,6 +38,7 @@ urlpatterns = [
     path("api/v1/rooms", include("rooms.urls")),
     path("api/v1/experiences", include("experiences.urls")),
     path("api/v1/photos", include("photos.urls")),
+    path("api/v1/wishlists", include("wishlists.urls")),
     path(
         "api/v1/swagger/schema/",
         schema_view.with_ui("swagger", cache_timeout=0),
