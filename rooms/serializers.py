@@ -5,6 +5,21 @@ from categories.serializers import AddCategorySerializer
 from wishlists.models import Wishlist
 
 
+class TinyRoomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Room
+        fields = (
+            "pk",
+            "name",
+            "created_at",
+            "updated_at",
+        )
+
+    # serializers.SerializerMethodField() 커스텀 하기위해 get_rating만들어야함
+    def get_rating(self, room):
+        return room.rating()
+
+
 class RoomListSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()  # get_rating 메소드이름 정해져있음! 필요로함!
     # photos = PhotoSerializer(many=True, read_only=True)

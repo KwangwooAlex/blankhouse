@@ -109,8 +109,8 @@ class TinyUserSerializer(ModelSerializer):
         model = User
         fields = (
             "pk",
-            "name",
             "username",
+            "avatar",
         )
 
 

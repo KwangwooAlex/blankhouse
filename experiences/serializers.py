@@ -5,6 +5,17 @@ from rest_framework import serializers
 from wishlists.models import Wishlist
 
 
+class TinyExperienceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Experience
+        fields = (
+            "pk",
+            "name",
+            "created_at",
+            "updated_at",
+        )
+
+
 class ExperienceListSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()  # get_rating 메소드이름 정해져있음! 필요로함!
     # photos = PhotoSerializer(many=True, read_only=True)
