@@ -21,10 +21,10 @@ class RoomAdmin(admin.ModelAdmin):
     list_display = (
         "pk",
         "name",
+        "owner",
         "price",
         "house_type",
         "rating",
-        "owner",
         "total_amenities",
         "created_at",
     )

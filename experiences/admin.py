@@ -7,6 +7,7 @@ class ExperienceAdmin(admin.ModelAdmin):
     list_display = (
         "pk",
         "name",
+        "host",
         "price",
         "start",
         "end",

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from .models import Amenity
+from .models import Amenity, Room
 from rest_framework.views import APIView
 from rest_framework.status import (
     HTTP_204_NO_CONTENT,
@@ -20,6 +20,31 @@ from django.db import transaction
 from drf_yasg.utils import swagger_auto_schema
 
 # Create your views here.
+
+
+class RoomDetail(GenericAPIView):
+    queryset = Room.objects.all()  # 필수
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_serializer_class(self, *args, **kwargs):
+        # if self.request.method == "PUT":
+        #     return serializers.ProductDetailEditSerializer
+        return serializers.RoomDetailSerializer
+
+    def get_object(self, pk):
+        try:
+            return Room.objects.get(pk=pk)
+        except Room.DoesNotExist:
+            raise NotFound
+
+    def get(self, request, pk):
+        Room = self.get_object(pk)
+
+        serializer = serializers.RoomDetailSerializer(
+            Room,
+            context={"request": request},
+        )
+        return Response(serializer.data)
 
 
 class Amenities(GenericAPIView):
