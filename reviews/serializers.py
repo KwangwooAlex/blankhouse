@@ -20,6 +20,10 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
             "experience",
             "payload",
             "rating",
+            "communication_rating",
+            "location_rating",
+            "accuracy_rating",
+            "check_in_rating",
             "created_at",
             "updated_at",
         )
@@ -55,6 +59,10 @@ class RoomReviewSerializer(serializers.ModelSerializer):
             "room",
             # "payload",
             "rating",
+            "communication_rating",
+            "location_rating",
+            "accuracy_rating",
+            "check_in_rating",
             "created_at",
             "updated_at",
         )
@@ -72,6 +80,10 @@ class ExperienceReviewSerializer(serializers.ModelSerializer):
             "experience",
             # "payload",
             "rating",
+            "communication_rating",
+            "location_rating",
+            "accuracy_rating",
+            "check_in_rating",
             "created_at",
             "updated_at",
         )
@@ -86,6 +98,12 @@ class RoomReviewSaveSerializer(serializers.ModelSerializer):
             "room_id",
             "payload",
             "rating",
+            "communication_rating",
+            "location_rating",
+            "accuracy_rating",
+            "check_in_rating",
+            "created_at",
+            "updated_at",
         )
 
 
@@ -98,16 +116,30 @@ class ExperienceReviewSaveSerializer(serializers.ModelSerializer):
             "experience_id",
             "payload",
             "rating",
+            "communication_rating",
+            "location_rating",
+            "accuracy_rating",
+            "check_in_rating",
         )
 
 
 class ReviewEditSerializer(serializers.ModelSerializer):
     payload = serializers.CharField(required=False)
     rating = serializers.IntegerField(required=False, min_value=0, max_value=5)
+    communication_rating = serializers.IntegerField(
+        required=False, min_value=0, max_value=5
+    )
+    location_rating = serializers.IntegerField(required=False, min_value=0, max_value=5)
+    accuracy_rating = serializers.IntegerField(required=False, min_value=0, max_value=5)
+    check_in_rating = serializers.IntegerField(required=False, min_value=0, max_value=5)
 
     class Meta:
         model = Review
         fields = (
             "payload",
             "rating",
+            "communication_rating",
+            "location_rating",
+            "accuracy_rating",
+            "check_in_rating",
         )

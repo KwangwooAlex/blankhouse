@@ -40,6 +40,10 @@ class ReviewAdmin(admin.ModelAdmin):
         "payload",
         "Room_Name",
         "Experience_Name",
+        "communication_rating",
+        "location_rating",
+        "accuracy_rating",
+        "check_in_rating",
     )
     list_filter = (
         # 필터 순서가 중요하다 wordFilter가 최우선이 되고싶으면 맨위에 놓으면됨

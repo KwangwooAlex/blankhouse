@@ -105,6 +105,8 @@ class PkUserSerializer(ModelSerializer):
 
 
 class TinyUserSerializer(ModelSerializer):
+    avatar = SaveUserAvatarSerializer(read_only=True)
+
     class Meta:
         model = User
         fields = (

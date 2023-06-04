@@ -39,13 +39,21 @@ class Room(CommonModel):
     address = models.CharField(
         max_length=250,
     )
+
     pet_friendly = models.BooleanField(
         default=True,
     )
+
     house_type = models.CharField(
         max_length=20,
         choices=RoomKindChoices.choices,
     )
+
+    things_to_know = models.TextField(
+        null=True,
+        blank=True,
+    )
+
     owner = models.ForeignKey(
         "users.User",
         on_delete=models.CASCADE,
