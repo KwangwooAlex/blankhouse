@@ -71,6 +71,7 @@ CUSTOM_APPS = [
     "wishlists.apps.WishlistsConfig",
     "reviews.apps.ReviewsConfig",
     "common.apps.CommonConfig",
+    "bookings.apps.BookingsConfig",
     # "products.apps.ProductsConfig",
     # "coupons.apps.CouponsConfig",
     # "settingsOption.apps.SettingsoptionConfig",

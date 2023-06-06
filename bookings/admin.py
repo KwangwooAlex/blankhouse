@@ -12,7 +12,7 @@ class Booking(admin.ModelAdmin):
         "experience",
         "check_in",
         "check_out",
-        "experience_time",
+        # "experience_time",
         "guests",
     )
     list_filter = ("kind",)

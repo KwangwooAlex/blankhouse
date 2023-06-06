@@ -18,6 +18,11 @@ from rest_framework.exceptions import (
 from rest_framework.generics import GenericAPIView
 from django.db import transaction
 from drf_yasg.utils import swagger_auto_schema
+from bookings.models import Booking
+from bookings.serializers import PublicBookingSerializer, CreateRoomBookingSerializer
+from django.utils import timezone
+from django.utils.decorators import method_decorator
+from drf_yasg import openapi
 
 # Create your views here.
 
@@ -106,6 +111,102 @@ class Amenities(GenericAPIView):
                 serializer.errors,
                 status=HTTP_400_BAD_REQUEST,
             )
+
+
+class RoomBookings(GenericAPIView):
+    queryset = Room.objects.all()  # 필수
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_serializer_class(self, *args, **kwargs):
+        if self.request.method == "POST":
+            return CreateRoomBookingSerializer
+        return PublicBookingSerializer
+
+    def get_object(self, pk):
+        try:
+            return Room.objects.get(pk=pk)
+        except:
+            raise NotFound
+
+    def get(self, request, pk):
+        room = self.get_object(pk)
+        now = timezone.localtime(timezone.now()).date()
+        bookings = Booking.objects.filter(
+            room=room,
+            kind=Booking.BookingKindChoices.ROOM,
+            check_in__gt=now,  # 현재보다 미래의 예약만 보여주고 싶음!
+        )
+        serializer = PublicBookingSerializer(bookings, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, pk):
+        room = self.get_object(pk)
+        serializer = CreateRoomBookingSerializer(
+            data=request.data,
+            context={"room": room},
+        )
+        if serializer.is_valid():
+            booking = serializer.save(
+                room=room,
+                user=request.user,
+                kind=Booking.BookingKindChoices.ROOM,
+            )
+            serializer = PublicBookingSerializer(booking)
+            return Response(serializer.data)
+        else:
+            return Response(
+                serializer.errors,
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+
+@method_decorator(
+    name="get",
+    decorator=swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "check_in",
+                openapi.IN_QUERY,
+                description="check in time ex) 2023-06-06",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "check_out",
+                openapi.IN_QUERY,
+                description="check out time ex) 2023-06-06",
+                type=openapi.TYPE_STRING,
+            ),
+        ]
+    ),
+)
+class RoomBookingCheck(GenericAPIView):
+    queryset = Room.objects.all()  # 필수
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_serializer_class(self, *args, **kwargs):
+        if self.request.method == "GET":
+            return CreateRoomBookingSerializer
+        # return PublicBookingSerializer
+
+    def get_object(self, pk):
+        try:
+            return Room.objects.get(pk=pk)
+        except:
+            raise NotFound
+
+    def get(self, request, pk):
+        room = self.get_object(pk)
+        check_in = request.query_params.get("check_in")
+        check_out = request.query_params.get("check_out")
+        print("check IN", check_in)
+        exists = Booking.objects.filter(
+            room=room,
+            check_in__lt=check_out,
+            check_out__gt=check_in,
+        ).exists()
+        if exists:
+            return Response({"ok": False})
+        return Response({"ok": True})
 
 
 class AmenityDetail(GenericAPIView):
