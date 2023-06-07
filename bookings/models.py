@@ -55,3 +55,11 @@ class Booking(CommonModel):
 
     def __str__(self):
         return f"{self.kind.title()} booking for: {self.user}"
+
+    def total_cost(self):
+        if self.room:
+            total_price = self.room.price + self.room.cleaning_fee
+            return f"{total_price}"
+        if self.experience:
+            total_price = self.experience.price * self.guests
+            return f"{total_price}"

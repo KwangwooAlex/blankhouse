@@ -48,6 +48,8 @@ class Experience(CommonModel):
         related_name="experiences",
     )
 
+    total_available_guest = models.PositiveIntegerField(default=1)
+
     def __str__(self) -> str:
         return self.name
 

@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from .models import Perk
+from .models import Perk, Experience
+from bookings.models import Booking
 from rest_framework.views import APIView
 from rest_framework.status import (
     HTTP_204_NO_CONTENT,
@@ -17,6 +18,14 @@ from rest_framework.exceptions import (
 )
 from rest_framework.generics import GenericAPIView
 from django.db import transaction
+from django.utils.decorators import method_decorator
+from drf_yasg import openapi
+from bookings.serializers import (
+    PublicExperienceBookingSerializer,
+    CreateExperienceBookingSerializer,
+)
+from django.utils import timezone
+from drf_yasg.utils import swagger_auto_schema
 
 # Create your views here.
 
@@ -123,3 +132,101 @@ class PerkDetail(GenericAPIView):
         perk.delete()
 
         return Response(status=HTTP_204_NO_CONTENT)
+
+
+class ExperienceBookings(GenericAPIView):
+    queryset = Experience.objects.all()  # 필수
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_serializer_class(self, *args, **kwargs):
+        if self.request.method == "POST":
+            return CreateExperienceBookingSerializer
+        return PublicExperienceBookingSerializer
+
+    def get_object(self, pk):
+        try:
+            return Experience.objects.get(pk=pk)
+        except:
+            raise NotFound
+
+    def get(self, request, pk):
+        experience = self.get_object(pk)
+        now = timezone.localtime(timezone.now()).date()
+        bookings = Booking.objects.filter(
+            experience=experience,
+            kind=Booking.BookingKindChoices.EXPERIENCE,
+            check_in__gte=now,  # 현재보다 미래의 예약만 보여주고 싶음!
+        )
+        serializer = PublicExperienceBookingSerializer(bookings, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, pk):
+        experience = self.get_object(pk)
+        serializer = CreateExperienceBookingSerializer(
+            data=request.data,
+            context={"experience": experience},
+        )
+        if serializer.is_valid():
+            booking = serializer.save(
+                experience=experience,
+                user=request.user,
+                kind=Booking.BookingKindChoices.EXPERIENCE,
+            )
+            serializer = PublicExperienceBookingSerializer(booking)
+            return Response(serializer.data)
+        else:
+            return Response(
+                serializer.errors,
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+
+@method_decorator(
+    name="get",
+    decorator=swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "check_in",
+                openapi.IN_QUERY,
+                description="check in time ex) 2023-06-06",
+                type=openapi.TYPE_STRING,
+            ),
+        ]
+    ),
+)
+class ExperienceBookingCheck(GenericAPIView):
+    queryset = Experience.objects.all()  # 필수
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_serializer_class(self, *args, **kwargs):
+        if self.request.method == "GET":
+            return CreateExperienceBookingSerializer
+        # return PublicBookingSerializer
+
+    def get_object(self, pk):
+        try:
+            return Experience.objects.get(pk=pk)
+        except:
+            raise NotFound
+
+    def get(self, request, pk):
+        experience = self.get_object(pk)
+        current_total_guest = 0
+        check_in = request.query_params.get("check_in")
+        for each_booking_guests in Booking.objects.filter(
+            experience=experience,
+            check_in=check_in,
+        ):
+            current_total_guest += each_booking_guests.guests
+        return Response(
+            {
+                "total available guest for the experience in a day": experience.total_available_guest,
+                "current total guest for this experience in the date": current_total_guest,
+                "available guests": experience.total_available_guest
+                - current_total_guest,
+            }
+        )
+
+        # if exists:
+        #     return Response({"ok": False})
+        # return Response({"ok": True})
