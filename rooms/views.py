@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .models import Amenity, Room
@@ -24,10 +25,84 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from drf_yasg import openapi
 from categories.models import Category
+from django.db.models import Avg, Sum, Count
 
 # Create your views here.
 
 
+@method_decorator(
+    name="get",
+    decorator=swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "keyword",
+                openapi.IN_QUERY,
+                description="Search by keyword",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "category",
+                openapi.IN_QUERY,
+                description="filter by category / default any",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "rating",
+                openapi.IN_QUERY,
+                description="filter by rating / default any ex) rating<=result",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "house_type",
+                openapi.IN_QUERY,
+                description="filter by house_type / default any  ex) Entire Place",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "number_of_bedrooms",
+                openapi.IN_QUERY,
+                description="filter by house_type / default any ex) 1",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "number_of_beds",
+                openapi.IN_QUERY,
+                description="filter by house_type / default any ex) 1",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "number_of_toilets",
+                openapi.IN_QUERY,
+                description="filter by number_of_toilets / default any ex) 1",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "mininum_price",
+                openapi.IN_QUERY,
+                description="filter by mininum_price / minimum <= result",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "maximum_price",
+                openapi.IN_QUERY,
+                description="filter by maximum_price / maximum >= result",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "per_page",
+                openapi.IN_QUERY,
+                description="default 12",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "page",
+                openapi.IN_QUERY,
+                description="default 1",
+                type=openapi.TYPE_STRING,
+            ),
+        ]
+    ),
+)
 class Rooms(GenericAPIView):
     queryset = Room.objects.all()  # 필수
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -39,8 +114,111 @@ class Rooms(GenericAPIView):
 
     def get(self, request):
         all_rooms = Room.objects.all()
+        all_rooms = (
+            all_rooms.filter(name__contains=request.query_params.get("keyword"))
+            if request.query_params.get("keyword")
+            else all_rooms
+        )
+
+        all_rooms = (
+            all_rooms.filter(category__name=request.query_params.get("category"))
+            if request.query_params.get("category")
+            else all_rooms
+        )
+
+        # all_rooms = (
+        #     all_rooms.filter(rating__gte=request.query_params.get("rating"))
+        #     if request.query_params.get("rating")
+        #     else all_rooms
+        # )
+
+        # all_rooms = all_rooms.values("reviews").annotate(count())
+        # all_rooms2 = (
+        #     all_rooms2.values("reviews")
+        #     .annotate(avg_rating=Sum("reviews__rating") / Count("reviews"))
+        #     .values("avg_rating")
+        # )
+        # all_rooms2 = (
+        #     all_rooms2
+        #     .filter(reviews__room__isnull=False)
+        #     .aggregate(Avg("reviews__rating"))
+        # )
+        # all_rooms2 = (
+        #     Room.objects.filter(reviews__room__isnull=False)
+        #     .annotate(avg_rating=Avg("reviews__rating"))
+        #     .filter(avg_rating__gte=4)
+        # )
+        # print("all_rooms result!!!!22222------", all_rooms2.avg_rating)
+        # print("all_rooms result!!!!------", all_rooms2.rating())
+
+        # https://stackoverflow.com/questions/59479908/how-to-make-an-average-from-values-of-a-foreign-key-in-django
+        # 위에 사이트에서 참고함... rating을 모델에서 aggregate로 추가해준뒤 (월래 def는 필터 안되기에 여기서 annotate로 avg_rating을 강제로 넣어줘서
+        # 필터하게끔 해준다!
+        all_rooms = (
+            all_rooms.annotate(avg_rating=Avg("reviews__rating")).filter(
+                avg_rating__gte=request.query_params.get("rating")
+            )
+            if request.query_params.get("rating")
+            else all_rooms
+        )
+
+        all_rooms = (
+            all_rooms.filter(house_type=request.query_params.get("house_type"))
+            if request.query_params.get("house_type")
+            else all_rooms
+        )
+
+        all_rooms = (
+            all_rooms.filter(
+                number_of_room=request.query_params.get("number_of_bedrooms")
+            )
+            if request.query_params.get("number_of_bedrooms")
+            else all_rooms
+        )
+
+        all_rooms = (
+            all_rooms.filter(number_of_bed=request.query_params.get("number_of_beds"))
+            if request.query_params.get("number_of_beds")
+            else all_rooms
+        )
+
+        all_rooms = (
+            all_rooms.filter(
+                number_of_toilet=request.query_params.get("number_of_toilets")
+            )
+            if request.query_params.get("number_of_toilets")
+            else all_rooms
+        )
+
+        all_rooms = (
+            all_rooms.filter(price__gte=request.query_params.get("mininum_price"))
+            if request.query_params.get("mininum_price")
+            else all_rooms
+        )
+
+        all_rooms = (
+            all_rooms.filter(price__lte=request.query_params.get("maximum_price"))
+            if request.query_params.get("maximum_price")
+            else all_rooms
+        )
+
+        per_page = (
+            request.query_params.get("per_page")
+            if request.query_params.get("per_page")
+            else 12
+        )
+        page = (
+            request.query_params.get("page") if request.query_params.get("page") else 1
+        )
+        try:
+            # all_rooms order_by없이 넣으면 경고뜸
+            paginator = Paginator(all_rooms.order_by("id"), per_page)
+            paginated_all_rooms_result = paginator.page(page)
+        except EmptyPage:
+            raise ParseError("Room not found")
+
         serializer = serializers.RoomListSerializer(
-            all_rooms,
+            paginated_all_rooms_result,
             many=True,
             context={"request": request},
             # 여기의 context를 이용하여 원하는 메소드 어떤것이든 시리얼라이저의

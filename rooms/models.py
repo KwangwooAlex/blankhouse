@@ -1,5 +1,6 @@
 from django.db import models
 from common.models import CommonModel
+from django.db.models import Avg, Sum, Count
 
 
 # models.Model 가장 기본 모델
@@ -99,6 +100,10 @@ class Room(CommonModel):
             for review in room.reviews.all().values("rating"):
                 total_rating += review["rating"]
             return round(total_rating / count, 2)
+
+    @property
+    def ratings(self):
+        return self.reviews.aggregate(avg_rating=Avg("rating"))["avg_rating"]
 
 
 class Amenity(CommonModel):
