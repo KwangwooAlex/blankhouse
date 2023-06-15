@@ -77,6 +77,12 @@ from django.db.models import Avg, Sum, Count
                 type=openapi.TYPE_STRING,
             ),
             openapi.Parameter(
+                "maximum_guests",
+                openapi.IN_QUERY,
+                description="filter by maximum_guests / default any ex) maximum_guests = result",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
                 "mininum_price",
                 openapi.IN_QUERY,
                 description="filter by mininum_price / minimum <= result",
@@ -199,6 +205,12 @@ class Rooms(GenericAPIView):
         all_rooms = (
             all_rooms.filter(price__lte=request.query_params.get("maximum_price"))
             if request.query_params.get("maximum_price")
+            else all_rooms
+        )
+
+        all_rooms = (
+            all_rooms.filter(maximum_guests=request.query_params.get("maximum_guests"))
+            if request.query_params.get("maximum_guests")
             else all_rooms
         )
 

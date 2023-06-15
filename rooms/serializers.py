@@ -191,6 +191,7 @@ class RoomListSerializer(serializers.ModelSerializer):
             "number_of_room",
             "number_of_toilet",
             "number_of_bed",
+            "maximum_guests",
             "house_type",
         )
 
@@ -235,6 +236,7 @@ class RoomDetailSerializer(serializers.ModelSerializer):
             "rating",
             "owner",
             "amenities",
+            "maximum_guests",
         )
 
     # serializers.SerializerMethodField() 커스텀 하기위해 get_rating만들어야함
