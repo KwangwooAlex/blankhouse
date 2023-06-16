@@ -72,9 +72,10 @@ CUSTOM_APPS = [
     "reviews.apps.ReviewsConfig",
     "common.apps.CommonConfig",
     "bookings.apps.BookingsConfig",
+    "settingsOption.apps.SettingsoptionConfig",
+    "userNotifications.apps.UsernotificationsConfig"
     # "products.apps.ProductsConfig",
     # "coupons.apps.CouponsConfig",
-    # "settingsOption.apps.SettingsoptionConfig",
     # "feedbacks.apps.FeedbacksConfig",
     # "chatrooms.apps.ChatroomsConfig",
     # "direct_messages.apps.DirectMessagesConfig",
