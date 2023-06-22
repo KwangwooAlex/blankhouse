@@ -79,7 +79,7 @@ from django.db.models import Avg, Sum, Count
             openapi.Parameter(
                 "maximum_guests",
                 openapi.IN_QUERY,
-                description="filter by maximum_guests / default any ex) maximum_guests = result",
+                description="filter by maximum_guests / default any ex) maximum_guests < result",
                 type=openapi.TYPE_STRING,
             ),
             openapi.Parameter(
@@ -92,6 +92,18 @@ from django.db.models import Avg, Sum, Count
                 "maximum_price",
                 openapi.IN_QUERY,
                 description="filter by maximum_price / maximum >= result",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "check_in",
+                openapi.IN_QUERY,
+                description="check in and check out must exist for filter / ex) 2023-06-06",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "check_out",
+                openapi.IN_QUERY,
+                description="check in and check out must exist for filter / ex) 2023-06-16",
                 type=openapi.TYPE_STRING,
             ),
             openapi.Parameter(
@@ -209,8 +221,24 @@ class Rooms(GenericAPIView):
         )
 
         all_rooms = (
-            all_rooms.filter(maximum_guests=request.query_params.get("maximum_guests"))
+            all_rooms.filter(
+                maximum_guests__gte=request.query_params.get("maximum_guests")
+            )
             if request.query_params.get("maximum_guests")
+            else all_rooms
+        )
+
+        all_rooms = (
+            all_rooms.exclude(
+                bookings__in=Booking.objects.filter(
+                    check_in__lt=request.query_params.get("check_out"),
+                    check_out__gt=request.query_params.get("check_in"),
+                )
+            )
+            if (
+                request.query_params.get("check_in")
+                and request.query_params.get("check_out")
+            )
             else all_rooms
         )
 
@@ -535,6 +563,64 @@ class RoomBookingCheck(GenericAPIView):
         if exists:
             return Response({"ok": False})
         return Response({"ok": True})
+
+
+# @method_decorator(
+#     name="get",
+#     decorator=swagger_auto_schema(
+#         manual_parameters=[
+#             openapi.Parameter(
+#                 "check_in",
+#                 openapi.IN_QUERY,
+#                 description="check in time ex) 2023-06-06",
+#                 type=openapi.TYPE_STRING,
+#             ),
+#             openapi.Parameter(
+#                 "check_out",
+#                 openapi.IN_QUERY,
+#                 description="check out time ex) 2023-06-06",
+#                 type=openapi.TYPE_STRING,
+#             ),
+#         ]
+#     ),
+# )
+# class AllRoomBookings(GenericAPIView):
+#     queryset = Room.objects.all()  # 필수
+#     permission_classes = [IsAuthenticatedOrReadOnly]
+
+#     def get_serializer_class(self, *args, **kwargs):
+#         if self.request.method == "POST":
+#             return CreateRoomBookingSerializer
+#         return PublicBookingSerializer
+
+#     def get_object(self):
+#         try:
+#             return Room.objects.all()
+#         except:
+#             raise NotFound
+
+#     def get(self, request):
+#         check_in = request.query_params.get("check_in")
+#         check_out = request.query_params.get("check_out")
+#         all_room = Room.objects.all()
+#         # now = timezone.localtime(timezone.now()).date()
+#         # print("all_roomall_room1111", all_room)
+#         # print("all_roomall_room10------", dir(all_room))
+
+#         all_room = Room.objects.exclude(
+#             bookings__in=Booking.objects.filter(
+#                 check_in__lt=check_out, check_out__gt=check_in
+#             )
+#         )
+#         #  위의식은 밑에껄 제대로 나타냄.. filter reverse 는 exclude가 아님!!
+#         # all_room = Room.objects.exclude(
+#         #     bookings__check_in__lt=check_out, bookings__check_out__gt=check_in
+#         # )
+#         # .distinct()
+
+#         print("all_roomall_room2222", all_room)
+#         serializer = serializers.RoomListSerializer(all_room, many=True)
+#         return Response(serializer.data)
 
 
 class AmenityDetail(GenericAPIView):

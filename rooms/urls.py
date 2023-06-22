@@ -9,6 +9,7 @@ urlpatterns = [
     path("/amenities/<int:pk>", views.AmenityDetail.as_view()),
     path("/<int:pk>/bookings", views.RoomBookings.as_view()),
     path("/<int:pk>/bookings/check", views.RoomBookingCheck.as_view()),
+    # path("/all/bookings/check", views.AllRoomBookings.as_view()),
     # path("/rooms", views.Room_Categories.as_view()),
     # path("/experience", views.Experience_Categories.as_view()),
     # path("/add", views.Categories.as_view()),
