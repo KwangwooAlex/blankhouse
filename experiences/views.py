@@ -27,10 +27,73 @@ from bookings.serializers import (
 from django.utils import timezone
 from drf_yasg.utils import swagger_auto_schema
 from categories.models import Category
+from django.db.models import F, Q, Avg, Sum, Count
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 # Create your views here.
 
 
+@method_decorator(
+    name="get",
+    decorator=swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "keyword",
+                openapi.IN_QUERY,
+                description="Search by keyword",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "category",
+                openapi.IN_QUERY,
+                description="filter by category / default any",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "experience_rating",
+                openapi.IN_QUERY,
+                description="filter by rating / default any ex) rating<=result",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "mininum_price",
+                openapi.IN_QUERY,
+                description="filter by mininum_price / minimum <= result",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "maximum_price",
+                openapi.IN_QUERY,
+                description="filter by maximum_price / maximum >= result",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "guest",
+                openapi.IN_QUERY,
+                description="for using this *(guest and checkin must exist) / the number of guest you want to use for experience / total_available_guests_expereince >= guest + current booked guests",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "check_in",
+                openapi.IN_QUERY,
+                description="for using this *(guest and checkin must exist)",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "per_page",
+                openapi.IN_QUERY,
+                description="default 12",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "page",
+                openapi.IN_QUERY,
+                description="default 1",
+                type=openapi.TYPE_STRING,
+            ),
+        ]
+    ),
+)
 class Experiences(GenericAPIView):
     queryset = Experience.objects.all()  # 필수
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -42,14 +105,146 @@ class Experiences(GenericAPIView):
 
     def get(self, request):
         all_experiences = Experience.objects.all()
+
+        all_experiences = (
+            all_experiences.filter(name__contains=request.query_params.get("keyword"))
+            if request.query_params.get("keyword")
+            else all_experiences
+        )
+
+        all_experiences = (
+            all_experiences.filter(category__name=request.query_params.get("category"))
+            if request.query_params.get("category")
+            else all_experiences
+        )
+
+        all_experiences = (
+            all_experiences.annotate(
+                avg_experience_rating=Avg("reviews__experience_rating")
+            ).filter(
+                avg_experience_rating__gte=request.query_params.get("experience_rating")
+            )
+            if request.query_params.get("experience_rating")
+            else all_experiences
+        )
+
+        all_experiences = (
+            all_experiences.filter(price__gte=request.query_params.get("mininum_price"))
+            if request.query_params.get("mininum_price")
+            else all_experiences
+        )
+
+        all_experiences = (
+            all_experiences.filter(price__lte=request.query_params.get("maximum_price"))
+            if request.query_params.get("maximum_price")
+            else all_experiences
+        )
+
+        # total_available_guest__lt < all booking in checkin + added guests
+        # all_experiences = (
+        #     all_experiences.aggregate(
+        #         total_available_guest__lt=Experience.objects.filter(
+        #             bookings__check_in=request.query_params.get("check_in"),
+        #         ).aggregate(Sum("bookings__guests"))["bookings__guests__sum"]
+        #     )
+        #     if (request.query_params.get("check_in"))
+        #     else all_experiences
+        # )
+
+        # all_experiences = (
+        #     all_experiences.exclude(
+        #         total_available_guest__lt=Experience.objects.filter(
+        #             bookings__check_in=request.query_params.get("check_in"),
+        #         ).aggregate(Sum("bookings__guests"))["bookings__guests__sum"]
+        #     )
+        #     if (request.query_params.get("check_in"))
+        #     else all_experiences
+        # )
+
+        # all_experiences = (
+        #     all_experiences.filter(
+        #         bookings__check_in=request.query_params.get("check_in"),
+        #         bookings__more_guest_available_for_filter__lte=10,
+        #     )
+        #     if (request.query_params.get("check_in"))
+        #     else all_experiences
+        # )
+
+        # all_experiences = (
+        #     Experience.objects.all()
+        #     .annotate(
+        #         current_total_guests=Sum(
+        #             "bookings__guests",
+        #             filter=Q(bookings__check_in=request.query_params.get("check_in")),
+        #         )
+        #     )
+        #     .filter(current_total_guests__lte=F("total_available_guest"))
+        #     if (request.query_params.get("check_in"))
+        #     else all_experiences
+        # )
+
+        # filtered_result = Experience.objects.filter(pk=1).values_list("pk", flat=True)
+        filtered_result = (
+            Experience.objects.all()
+            .annotate(
+                current_total_guests=Sum(
+                    "bookings__guests",
+                    filter=Q(bookings__check_in=request.query_params.get("check_in")),
+                )
+            )
+            .filter(
+                current_total_guests__gt=F("total_available_guest")
+                - int(request.query_params.get("guest"))
+            )
+            if (
+                request.query_params.get("check_in")
+                and request.query_params.get("guest")
+            )
+            else all_experiences
+        )
+
+        all_experiences = (
+            all_experiences.exclude(pk__in=filtered_result)
+            if (
+                request.query_params.get("check_in")
+                and request.query_params.get("guest")
+            )
+            else all_experiences
+        )
+
+        per_page = (
+            request.query_params.get("per_page")
+            if request.query_params.get("per_page")
+            else 12
+        )
+        page = (
+            request.query_params.get("page") if request.query_params.get("page") else 1
+        )
+
+        try:
+            # all_rooms order_by없이 넣으면 경고뜸
+            paginator = Paginator(all_experiences.order_by("id"), per_page)
+            paginated_all_result = paginator.page(page)
+        except EmptyPage:
+            raise ParseError("Room not found")
+
         serializer = serializers.ExperienceListSerializer(
-            all_experiences,
+            paginated_all_result,
             many=True,
             context={"request": request},
             # 여기의 context를 이용하여 원하는 메소드 어떤것이든 시리얼라이저의
             # context에 접근할수있음
         )
         return Response(serializer.data)
+
+        # serializer = serializers.ExperienceListSerializer(
+        #     all_experiences,
+        #     many=True,
+        #     context={"request": request},
+        #     # 여기의 context를 이용하여 원하는 메소드 어떤것이든 시리얼라이저의
+        #     # context에 접근할수있음
+        # )
+        # return Response(serializer.data)
 
     def post(self, request):
         #  if request.user.is_authenticated: 위에서 검사해준다

@@ -37,13 +37,16 @@ class ReviewAdmin(admin.ModelAdmin):
     list_display = (
         "pk",
         "__str__",  # model의 __str__것을 보여주고 싶으면 저렇게 쓰면됨 타이틀은 클래스 이름이 될것임 내용은 __str__
-        "payload",
+        # "payload",
         "Room_Name",
         "Experience_Name",
+        "rating",
         "communication_rating",
         "location_rating",
         "accuracy_rating",
         "check_in_rating",
+        "cleanliness_rating",
+        "experience_rating",
     )
     list_filter = (
         # 필터 순서가 중요하다 wordFilter가 최우선이 되고싶으면 맨위에 놓으면됨

@@ -1,5 +1,6 @@
 from django.db import models
 from common.models import CommonModel
+from django.db.models import Avg, Sum, Count
 
 
 class Experience(CommonModel):
@@ -56,20 +57,14 @@ class Experience(CommonModel):
     def total_perks(self):
         return self.perks.count()
 
-    def rating(experience):
+    def experience_rating(experience):
         count = experience.reviews.count()
         if count == 0:
             return 0
         else:
             total_rating = 0
-            # room에서 바로 review접근 가능함, review에서 포린키 연결했거 related_name 해놔서
-            # all().values("rating") 안쓰고 그냥 all()만 쓰면 필요없는 정보까지 다 가져올것임
-            # values("rating")을 써줘야 rating에관한 정보만 가져올것임
-            # 문제는 review가 객체가 아니라서 review.rating 대신 review["rating"]을 해야함
-            # 리스트로 받아온다 [{review:"4"},{review:"3"}] 이렇게..
-            # value()를 안썼다면 [<object room1>,<object room2>] 이렇게 객체의 어레이가 왔을것임
-            for review in experience.reviews.all().values("rating"):
-                total_rating += review["rating"]
+            for review in experience.reviews.all().values("experience_rating"):
+                total_rating += review["experience_rating"]
             return round(total_rating / count, 2)
 
 

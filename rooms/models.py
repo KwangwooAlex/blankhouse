@@ -105,6 +105,56 @@ class Room(CommonModel):
     def ratings(self):
         return self.reviews.aggregate(avg_rating=Avg("rating"))["avg_rating"]
 
+    def cleanliness_rating(room):
+        count = room.reviews.count()
+        if count == 0:
+            return 0
+        else:
+            total_rating = 0
+            for review in room.reviews.all().values("cleanliness_rating"):
+                total_rating += review["cleanliness_rating"]
+            return round(total_rating / count, 2)
+
+    def accuracy_rating(room):
+        count = room.reviews.count()
+        if count == 0:
+            return 0
+        else:
+            total_rating = 0
+            for review in room.reviews.all().values("accuracy_rating"):
+                total_rating += review["accuracy_rating"]
+            return round(total_rating / count, 2)
+
+    def communication_rating(room):
+        count = room.reviews.count()
+        if count == 0:
+            return 0
+        else:
+            total_rating = 0
+            for review in room.reviews.all().values("communication_rating"):
+                total_rating += review["communication_rating"]
+            return round(total_rating / count, 2)
+
+    def location_rating(room):
+        count = room.reviews.count()
+        if count == 0:
+            return 0
+        else:
+            total_rating = 0
+            for review in room.reviews.all().values("location_rating"):
+                total_rating += review["location_rating"]
+            return round(total_rating / count, 2)
+
+    def check_in_rating(room):
+        count = room.reviews.count()
+        if count == 0:
+            return 0
+        else:
+            total_rating = 0
+            for review in room.reviews.all().values("check_in_rating"):
+                total_rating += review["check_in_rating"]
+            return round(total_rating / count, 2)
+
 
 class Amenity(CommonModel):
 

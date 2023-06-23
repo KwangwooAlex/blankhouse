@@ -202,6 +202,11 @@ class RoomListSerializer(serializers.ModelSerializer):
 
 class RoomDetailSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()  # get_rating 메소드이름 정해져있음! 필요로함!
+    cleanliness_rating = serializers.SerializerMethodField()
+    accuracy_rating = serializers.SerializerMethodField()
+    communication_rating = serializers.SerializerMethodField()
+    location_rating = serializers.SerializerMethodField()
+    check_in_rating = serializers.SerializerMethodField()
     photos = PhotoInRoomSerializer(many=True, read_only=True)
     category = AddCategorySerializer()
     amenities = AmenitySerializer(many=True)
@@ -234,6 +239,11 @@ class RoomDetailSerializer(serializers.ModelSerializer):
             "is_liked",
             "description",
             "rating",
+            "cleanliness_rating",
+            "accuracy_rating",
+            "communication_rating",
+            "location_rating",
+            "check_in_rating",
             "owner",
             "amenities",
             "maximum_guests",
@@ -242,3 +252,18 @@ class RoomDetailSerializer(serializers.ModelSerializer):
     # serializers.SerializerMethodField() 커스텀 하기위해 get_rating만들어야함
     def get_rating(self, room):
         return room.rating()
+
+    def get_cleanliness_rating(self, room):
+        return room.cleanliness_rating()
+
+    def get_accuracy_rating(self, room):
+        return room.accuracy_rating()
+
+    def get_communication_rating(self, room):
+        return room.communication_rating()
+
+    def get_location_rating(self, room):
+        return room.location_rating()
+
+    def get_check_in_rating(self, room):
+        return room.check_in_rating()

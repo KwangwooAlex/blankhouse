@@ -144,31 +144,6 @@ class Rooms(GenericAPIView):
             else all_rooms
         )
 
-        # all_rooms = (
-        #     all_rooms.filter(rating__gte=request.query_params.get("rating"))
-        #     if request.query_params.get("rating")
-        #     else all_rooms
-        # )
-
-        # all_rooms = all_rooms.values("reviews").annotate(count())
-        # all_rooms2 = (
-        #     all_rooms2.values("reviews")
-        #     .annotate(avg_rating=Sum("reviews__rating") / Count("reviews"))
-        #     .values("avg_rating")
-        # )
-        # all_rooms2 = (
-        #     all_rooms2
-        #     .filter(reviews__room__isnull=False)
-        #     .aggregate(Avg("reviews__rating"))
-        # )
-        # all_rooms2 = (
-        #     Room.objects.filter(reviews__room__isnull=False)
-        #     .annotate(avg_rating=Avg("reviews__rating"))
-        #     .filter(avg_rating__gte=4)
-        # )
-        # print("all_rooms result!!!!22222------", all_rooms2.avg_rating)
-        # print("all_rooms result!!!!------", all_rooms2.rating())
-
         # https://stackoverflow.com/questions/59479908/how-to-make-an-average-from-values-of-a-foreign-key-in-django
         # 위에 사이트에서 참고함... rating을 모델에서 aggregate로 추가해준뒤 (월래 def는 필터 안되기에 여기서 annotate로 avg_rating을 강제로 넣어줘서
         # 필터하게끔 해준다!

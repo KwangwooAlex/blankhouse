@@ -115,7 +115,9 @@ class ExperienceEditSerializer(serializers.ModelSerializer):
 
 
 class ExperienceListSerializer(serializers.ModelSerializer):
-    rating = serializers.SerializerMethodField()  # get_rating 메소드이름 정해져있음! 필요로함!
+    experience_rating = (
+        serializers.SerializerMethodField()
+    )  # get_experience_rating 메소드이름 정해져있음! 필요로함!
     photos = TinyPhotoInExperienceSerializer(many=True, read_only=True)
     category = AddCategorySerializer()
 
@@ -146,13 +148,13 @@ class ExperienceListSerializer(serializers.ModelSerializer):
             "updated_at",
             "is_liked",
             "description",
-            "rating",
+            "experience_rating",
             "host",
         )
 
     # serializers.SerializerMethodField() 커스텀 하기위해 get_rating만들어야함
-    def get_rating(self, room):
-        return room.rating()
+    def get_experience_rating(self, experience):
+        return experience.experience_rating()
 
 
 class PerkSerializer(ModelSerializer):
@@ -186,7 +188,9 @@ class EditPerkSerializer(ModelSerializer):
 
 
 class ExperienceDetailSerializer(serializers.ModelSerializer):
-    rating = serializers.SerializerMethodField()  # get_rating 메소드이름 정해져있음! 필요로함!
+    experience_rating = (
+        serializers.SerializerMethodField()
+    )  # get_experience_rating 메소드이름 정해져있음! 필요로함!
     photos = PhotoInExperienceSerializer(many=True, read_only=True)
     category = AddCategorySerializer()
     perks = PerkSerializer(many=True)
@@ -225,9 +229,9 @@ class ExperienceDetailSerializer(serializers.ModelSerializer):
             "description",
             "total_available_guest",
             "host",
-            "rating",
+            "experience_rating",
         )
 
     # serializers.SerializerMethodField() 커스텀 하기위해 get_rating만들어야함
-    def get_rating(self, experience):
-        return experience.rating()
+    def get_experience_rating(self, experience):
+        return experience.experience_rating()

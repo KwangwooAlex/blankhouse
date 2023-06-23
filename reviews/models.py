@@ -30,10 +30,12 @@ class Review(CommonModel):
 
     payload = models.TextField()  # 내용
     rating = models.PositiveIntegerField(default=0)  # value 가성비에 대한것
+    cleanliness_rating = models.PositiveIntegerField(default=0)
     communication_rating = models.PositiveIntegerField(default=0)
     location_rating = models.PositiveIntegerField(default=0)
     accuracy_rating = models.PositiveIntegerField(default=0)
     check_in_rating = models.PositiveIntegerField(default=0)
+    experience_rating = models.PositiveIntegerField(default=0)
 
     def Room_Name(self):
         if self.room:
@@ -44,4 +46,5 @@ class Review(CommonModel):
             return self.experience.name
 
     def __str__(self) -> str:
-        return f"{self.user} / {self.rating}⭐️"
+        #  / {self.rating}⭐️
+        return f"{self.user}"
