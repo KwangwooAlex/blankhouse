@@ -76,9 +76,9 @@ CUSTOM_APPS = [
     "userNotifications.apps.UsernotificationsConfig",
     "chatrooms.apps.ChatroomsConfig",
     "direct_messages.apps.DirectMessagesConfig",
-    "bookingHistory.apps.BookinghistoryConfig"
+    "bookingHistory.apps.BookinghistoryConfig",
+    "promotions.apps.PromotionsConfig",
     # "products.apps.ProductsConfig",
-    # "coupons.apps.CouponsConfig",
     # "feedbacks.apps.FeedbacksConfig",
     # "orders.apps.OrdersConfig",
     # "soldProducts.apps.SoldproductsConfig",
