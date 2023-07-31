@@ -35,7 +35,7 @@ class Review(CommonModel):
     location_rating = models.PositiveIntegerField(default=0)
     accuracy_rating = models.PositiveIntegerField(default=0)
     check_in_rating = models.PositiveIntegerField(default=0)
-    experience_rating = models.PositiveIntegerField(default=0)
+    experience_rating = models.PositiveIntegerField(default=0)  # 이건 experience만..
 
     def Room_Name(self):
         if self.room:

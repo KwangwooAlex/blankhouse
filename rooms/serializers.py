@@ -247,6 +247,16 @@ class RoomDetailSerializer(serializers.ModelSerializer):
             "owner",
             "amenities",
             "maximum_guests",
+            "cleaning_fee",
+            "number_of_room",
+            "number_of_toilet",
+            "number_of_bed",
+            "address",
+            "things_to_know",
+            "house_type",
+            "pet_friendly",
+            "city",
+            "country",
         )
 
     # serializers.SerializerMethodField() 커스텀 하기위해 get_rating만들어야함

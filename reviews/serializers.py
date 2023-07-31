@@ -63,6 +63,8 @@ class RoomReviewSerializer(serializers.ModelSerializer):
             "location_rating",
             "accuracy_rating",
             "check_in_rating",
+            "cleanliness_rating",
+            "payload",
             "created_at",
             "updated_at",
         )
@@ -79,11 +81,11 @@ class ExperienceReviewSerializer(serializers.ModelSerializer):
             "user",
             "experience",
             # "payload",
-            "rating",
+            "experience_rating",
             "communication_rating",
             "location_rating",
             "accuracy_rating",
-            "check_in_rating",
+            "payload",
             "created_at",
             "updated_at",
         )
