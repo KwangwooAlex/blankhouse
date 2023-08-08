@@ -20,6 +20,7 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
             "experience",
             "payload",
             "rating",
+            "experience_rating",
             "communication_rating",
             "location_rating",
             "accuracy_rating",
@@ -117,11 +118,11 @@ class ExperienceReviewSaveSerializer(serializers.ModelSerializer):
         fields = (
             "experience_id",
             "payload",
-            "rating",
+            "experience_rating",
             "communication_rating",
             "location_rating",
             "accuracy_rating",
-            "check_in_rating",
+            # "check_in_rating",
         )
 
 
@@ -140,8 +141,35 @@ class ReviewEditSerializer(serializers.ModelSerializer):
         fields = (
             "payload",
             "rating",
+            "experience_rating",
             "communication_rating",
             "location_rating",
             "accuracy_rating",
             "check_in_rating",
+        )
+
+
+class AllMyReviewSerializer(serializers.ModelSerializer):
+    user = TinyUserSerializer(read_only=True)
+    room = TinyRoomSerializer(read_only=True)
+    experience = TinyExperienceSerializer(read_only=True)
+
+    class Meta:
+        model = Review
+        fields = (
+            "pk",
+            "user",
+            "room",
+            "experience",
+            # "payload",
+            "rating",
+            "experience_rating",
+            "communication_rating",
+            "location_rating",
+            "accuracy_rating",
+            "check_in_rating",
+            "cleanliness_rating",
+            "payload",
+            "created_at",
+            "updated_at",
         )

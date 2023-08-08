@@ -18,7 +18,7 @@ from django.urls import path, include
 
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view as swagger_get_schema_view
-
+from users.views import LogOut
 
 # for swagger
 schema_view = swagger_get_schema_view(
@@ -33,6 +33,7 @@ schema_view = swagger_get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    # path("/accounts/logout", LogOut.as_view()),
     path("api/v1/reviews", include("reviews.urls")),
     path("api/v1/users", include("users.urls")),
     path("api/v1/categories", include("categories.urls")),

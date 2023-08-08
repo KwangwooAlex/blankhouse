@@ -1,6 +1,6 @@
 import requests
 from django.conf import settings
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
 from rest_framework.status import HTTP_200_OK
 from rest_framework.response import Response
@@ -28,7 +28,7 @@ from rest_framework.exceptions import (
 
 class Reviews(GenericAPIView):
     queryset = Review.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_serializer_class(self, *args, **kwargs):
         return serializers.ReviewSerializer
@@ -65,7 +65,7 @@ class Reviews(GenericAPIView):
 
 class RoomReviews(GenericAPIView):
     queryset = Review.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_serializer_class(self, *args, **kwargs):
         if self.request.method == "POST":
@@ -81,6 +81,7 @@ class RoomReviews(GenericAPIView):
     def get(self, request):
         # if request.user.is_superuser:
         # 전체 방리뷰만 보여주세요 리뷰에 room없으면 제외 해주세요
+        # 모든사람이 다 리뷰를 볼수있음!
         all_reviews = Review.objects.exclude(room__isnull=True)
         serializer = serializers.RoomReviewSerializer(
             all_reviews,
@@ -150,7 +151,7 @@ class RoomReviews(GenericAPIView):
 )
 class OneRoomAllReviews(GenericAPIView):
     queryset = Review.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_serializer_class(self, *args, **kwargs):
         if self.request.method == "POST":
@@ -191,12 +192,21 @@ class OneRoomAllReviews(GenericAPIView):
             # 여기의 context를 이용하여 원하는 메소드 어떤것이든 시리얼라이저의
             # context에 접근할수있음
         )
-        return Response(serializer.data)
+        return Response(
+            {
+                "page_size": per_page,
+                "total_objects": paginator.count,
+                "total_pages": paginator.num_pages,
+                "current_page_number": page,
+                "results": serializer.data,
+            }
+        )
+        # return Response(serializer.data)
 
 
 class ExperienceReviews(GenericAPIView):
     queryset = Review.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_serializer_class(self, *args, **kwargs):
         if self.request.method == "POST":
@@ -211,27 +221,30 @@ class ExperienceReviews(GenericAPIView):
             raise NotFound
 
     def get(self, request):
-        if request.user.is_superuser:
-            all_reviews = Review.objects.exclude(experience__isnull=True)
-            serializer = serializers.ExperienceReviewSerializer(
-                all_reviews,
-                many=True,
-                context={"request": request},
-                # 여기의 context를 이용하여 원하는 메소드 어떤것이든 시리얼라이저의
-                # context에 접근할수있음
-            )
-            return Response(serializer.data)
-        else:
-            user_reviews = Review.objects.filter(user=request.user)
-            all_user_experience_reviews = user_reviews.exclude(experience__isnull=True)
-            serializer = serializers.ExperienceReviewSerializer(
-                all_user_experience_reviews,
-                many=True,
-                context={"request": request},
-                # 여기의 context를 이용하여 원하는 메소드 어떤것이든 시리얼라이저의
-                # context에 접근할수있음
-            )
-            return Response(serializer.data)
+        # if request.user.is_superuser:
+        # 전체 방리뷰만 보여주세요 리뷰에 experience없으면 제외 해주세요
+        # 모든사람이 다 리뷰를 볼수있음!
+        all_reviews = Review.objects.exclude(experience__isnull=True)
+        serializer = serializers.ExperienceReviewSerializer(
+            all_reviews,
+            many=True,
+            context={"request": request},
+            # 여기의 context를 이용하여 원하는 메소드 어떤것이든 시리얼라이저의
+            # context에 접근할수있음
+        )
+        return Response(serializer.data)
+
+    # else:
+    #     user_reviews = Review.objects.filter(user=request.user)
+    #     all_user_experience_reviews = user_reviews.exclude(experience__isnull=True)
+    #     serializer = serializers.ExperienceReviewSerializer(
+    #         all_user_experience_reviews,
+    #         many=True,
+    #         context={"request": request},
+    #         # 여기의 context를 이용하여 원하는 메소드 어떤것이든 시리얼라이저의
+    #         # context에 접근할수있음
+    #     )
+    #     return Response(serializer.data)
 
     def post(self, request):
         # web에서 받아온 데이터를 json으로 번역해서 django에 넘겨야함
@@ -245,7 +258,7 @@ class ExperienceReviews(GenericAPIView):
                 experience=experience,
             )
 
-            serializer = serializers.ReviewDetailSerializer(
+            serializer = serializers.ExperienceReviewSerializer(
                 review,
                 context={"request": request},
             )
@@ -280,7 +293,7 @@ class ExperienceReviews(GenericAPIView):
 )
 class OneExperienceAllReviews(GenericAPIView):
     queryset = Review.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_serializer_class(self, *args, **kwargs):
         if self.request.method == "POST":
@@ -326,7 +339,7 @@ class OneExperienceAllReviews(GenericAPIView):
 
 class ReviewDetail(GenericAPIView):
     queryset = Review.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_serializer_class(self, *args, **kwargs):
         if self.request.method == "PUT":
@@ -399,12 +412,12 @@ class ReviewDetail(GenericAPIView):
 )
 class MyReviews(GenericAPIView):
     queryset = Review.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_serializer_class(self, *args, **kwargs):
         if self.request.method == "POST":
             return serializers.RoomReviewSaveSerializer
-        return serializers.RoomReviewSerializer
+        return serializers.AllMyReviewSerializer
 
     def get_object(self, pk):
         try:
@@ -431,7 +444,7 @@ class MyReviews(GenericAPIView):
         except EmptyPage:
             raise ParseError("Review not found or last page")
 
-        serializer = serializers.RoomReviewSerializer(
+        serializer = serializers.AllMyReviewSerializer(
             paginated_all_reviews_result,
             many=True,
             context={"request": request},

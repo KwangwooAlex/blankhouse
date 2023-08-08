@@ -235,7 +235,16 @@ class Experiences(GenericAPIView):
             # 여기의 context를 이용하여 원하는 메소드 어떤것이든 시리얼라이저의
             # context에 접근할수있음
         )
-        return Response(serializer.data)
+        # return Response(serializer.data)
+        return Response(
+            {
+                "page_size": per_page,
+                "total_objects": paginator.count,
+                "total_pages": paginator.num_pages,
+                "current_page_number": page,
+                "results": serializer.data,
+            }
+        )
 
         # serializer = serializers.ExperienceListSerializer(
         #     all_experiences,
