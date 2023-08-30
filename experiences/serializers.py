@@ -230,6 +230,7 @@ class ExperienceDetailSerializer(serializers.ModelSerializer):
             "total_available_guest",
             "host",
             "experience_rating",
+            "total_experience_review",
         )
 
     # serializers.SerializerMethodField() 커스텀 하기위해 get_rating만들어야함

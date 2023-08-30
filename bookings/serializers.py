@@ -63,6 +63,28 @@ class PublicBookingSerializer(serializers.ModelSerializer):
             "check_in",
             "check_out",
             "guests",
+            "status",
+            "total_cost",
+            "created_at",
+            "updated_at",
+        )
+
+
+class PublicBookingWithNameSerializer(serializers.ModelSerializer):
+    guests = serializers.IntegerField(required=False, min_value=1)
+    room = TinyRoomSerializer(read_only=True)
+    user = TinyUserSerializer(read_only=True)
+
+    class Meta:
+        model = Booking
+        fields = (
+            "pk",
+            "room",
+            "user",
+            "check_in",
+            "check_out",
+            "guests",
+            "status",
             "total_cost",
             "created_at",
             "updated_at",

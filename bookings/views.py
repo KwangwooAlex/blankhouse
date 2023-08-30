@@ -18,6 +18,35 @@ from rest_framework.status import (
 
 
 # Create your views here.
+class Bookings(GenericAPIView):
+    queryset = Booking.objects.all()  # 필수
+
+    permission_classes = [
+        IsAuthenticatedOrReadOnly
+    ]  # 유저검사 get은허용 delete put post는 유저인증된사라만 가능! 다른기능은 없음
+
+    def get_serializer_class(self, *args, **kwargs):
+        return serializers.PublicBookingWithNameSerializer
+
+    def get_object(self, request):
+        try:
+            return Booking.objects.filter(user=request.user)
+        except Booking.DoesNotExist:
+            raise NotFound
+
+    def get(self, request):
+        booking = self.get_object(request)
+        serializer = serializers.PublicBookingWithNameSerializer(
+            booking,
+            many=True,
+            context={"request": request},
+            # 여기의 context를 이용하여 원하는 메소드 어떤것이든 시리얼라이저의
+            # context에 접근할수있음
+        )
+        return Response(serializer.data)
+
+
+# Create your views here.
 class BookingDetail(GenericAPIView):
     queryset = Booking.objects.all()  # 필수
 

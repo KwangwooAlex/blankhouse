@@ -105,6 +105,10 @@ class Room(CommonModel):
     def ratings(self):
         return self.reviews.aggregate(avg_rating=Avg("rating"))["avg_rating"]
 
+    def total_room_review(room):
+        total = room.reviews.count()
+        return total
+
     def cleanliness_rating(room):
         count = room.reviews.count()
         if count == 0:

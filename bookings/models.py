@@ -10,6 +10,12 @@ class Booking(CommonModel):
         ROOM = "room", "Room"
         EXPERIENCE = "experience", "Experience"
 
+    class BookingStatusChoices(models.TextChoices):
+        PENDING = "pending", "Pending"
+        ONGOING = "ongoing", "Ongoing"
+        COMPLETED = "completed", "Completed"
+        CANCELED = "canceled", "Canceled"
+
     kind = models.CharField(
         max_length=15,
         choices=BookingKindChoices.choices,
@@ -52,13 +58,33 @@ class Booking(CommonModel):
     #     blank=True,
     # )
     guests = models.PositiveIntegerField()
+    status = models.CharField(
+        max_length=15, choices=BookingStatusChoices.choices, default="pending"
+    )
+
+    # 시간 example
+    # class UserData(models.Model):
+    # uid = models.CharField(max_length=100)
+    # email = models.CharField(max_length=100)
+    # start_date = models.DateField(auto_now_add=True,editable=False)
+    # end_date = models.DateTimeField(auto_now=True)
+
+    # @property
+    # def duration(self):
+    #     if not (self.start_date and self.end_date):
+    #         return None
+    #     a,b=self.start_date, self.end_date
+    #     return '%s:%s' % ((b-a).days*24 + (b-a).seconds//3600, (b-a).seconds%3600//60)
 
     def __str__(self):
         return f"{self.kind.title()} booking for: {self.user}"
 
     def total_cost(self):
         if self.room:
-            total_price = self.room.price + self.room.cleaning_fee
+            total_price = (
+                self.room.price * (self.check_out - self.check_in).days
+                + self.room.cleaning_fee
+            )
             return f"{total_price}"
         if self.experience:
             total_price = self.experience.price * self.guests

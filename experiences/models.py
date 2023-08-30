@@ -54,6 +54,10 @@ class Experience(CommonModel):
     def __str__(self) -> str:
         return self.name
 
+    def total_experience_review(experience):
+        total = experience.reviews.count()
+        return total
+
     def total_perks(self):
         return self.perks.count()
 

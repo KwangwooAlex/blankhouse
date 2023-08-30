@@ -54,8 +54,10 @@ class RoomBookingHistories(GenericAPIView):
                     booking = Booking.objects.filter(pk=request.data.get("booking_id"))[
                         0
                     ]
+                    booking.status = "ongoing"  # pending to ongoing
+                    booking.save()
                     bookingHistory = serializer.save(booking=booking)
-                    user = User.objects.get(username=request.user.username)
+                    user = User.objects.get(bookings=booking)
                     # if user.balance - order.total_price() < 0:
                     if (user.balance - bookingHistory.final_total_cost) < 0:
                         error = "Your balance is not enough."

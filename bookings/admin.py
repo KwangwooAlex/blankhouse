@@ -11,6 +11,7 @@ class Booking(admin.ModelAdmin):
         "user",
         "room",
         "experience",
+        "status",
         "check_in",
         "check_out",
         "guests",

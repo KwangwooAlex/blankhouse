@@ -471,11 +471,12 @@ class RoomBookings(GenericAPIView):
 
     def get(self, request, pk):
         room = self.get_object(pk)
-        now = timezone.localtime(timezone.now()).date()
+        print("room", room)
+        # now = timezone.localtime(timezone.now()).date()
         bookings = Booking.objects.filter(
             room=room,
             kind=Booking.BookingKindChoices.ROOM,
-            check_in__gt=now,  # 현재보다 미래의 예약만 보여주고 싶음!
+            # check_in__gt=now,  # 현재보다 미래의 예약만 보여주고 싶음!
         )
         serializer = PublicBookingSerializer(bookings, many=True)
         return Response(serializer.data)

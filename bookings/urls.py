@@ -3,6 +3,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 from . import views
 
 urlpatterns = [
+    path("", views.Bookings.as_view()),
     path("/<int:pk>", views.BookingDetail.as_view()),
     # path("/add", views.Categories.as_view()),
 ]

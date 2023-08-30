@@ -238,6 +238,7 @@ class RoomDetailSerializer(serializers.ModelSerializer):
             "updated_at",
             "is_liked",
             "description",
+            "total_room_review",
             "rating",
             "cleanliness_rating",
             "accuracy_rating",
