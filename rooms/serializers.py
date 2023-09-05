@@ -6,6 +6,8 @@ from rest_framework import serializers
 from categories.serializers import AddCategorySerializer
 from wishlists.models import Wishlist
 
+# from photos.serializers import SaveRoomPhotoSerializer
+
 
 class SaveUserAvatarInRoomSerializer(ModelSerializer):
     class Meta:
@@ -69,6 +71,29 @@ class TinyRoomSerializer(serializers.ModelSerializer):
         fields = (
             "pk",
             "name",
+            "created_at",
+            "updated_at",
+        )
+
+    # serializers.SerializerMethodField() 커스텀 하기위해 get_rating만들어야함
+    def get_rating(self, room):
+        return room.rating()
+
+
+class TinyRoomWithPictureSerializer(serializers.ModelSerializer):
+    photos = TinyPhotoInRoomSerializer(many=True, read_only=True)
+    owner = TinyUserInRoomSerializer(read_only=True)
+
+    class Meta:
+        model = Room
+        fields = (
+            "pk",
+            "name",
+            "owner",
+            "country",
+            "city",
+            "address",
+            "photos",
             "created_at",
             "updated_at",
         )

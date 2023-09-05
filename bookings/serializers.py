@@ -3,7 +3,7 @@ from rest_framework import serializers
 from .models import Booking
 from rooms.models import Room
 from experiences.serializers import TinyExperienceSerializer
-from rooms.serializers import TinyRoomSerializer
+from rooms.serializers import TinyRoomSerializer, TinyRoomWithPictureSerializer
 from users.serializers import TinyUserSerializer
 
 
@@ -53,7 +53,7 @@ class CreateRoomBookingSerializer(serializers.ModelSerializer):
 
 class PublicBookingSerializer(serializers.ModelSerializer):
     guests = serializers.IntegerField(required=False, min_value=1)
-    room = TinyRoomSerializer(read_only=True)
+    room = TinyRoomWithPictureSerializer(read_only=True)
 
     class Meta:
         model = Booking
@@ -72,7 +72,7 @@ class PublicBookingSerializer(serializers.ModelSerializer):
 
 class PublicBookingWithNameSerializer(serializers.ModelSerializer):
     guests = serializers.IntegerField(required=False, min_value=1)
-    room = TinyRoomSerializer(read_only=True)
+    room = TinyRoomWithPictureSerializer(read_only=True)
     user = TinyUserSerializer(read_only=True)
 
     class Meta:
@@ -151,7 +151,7 @@ class BookingDetailSerializer(serializers.ModelSerializer):
     guests = serializers.IntegerField(required=False, min_value=1)
     user = TinyUserSerializer(read_only=True)
     experience = TinyExperienceSerializer(read_only=True)
-    room = TinyRoomSerializer(read_only=True)
+    room = TinyRoomWithPictureSerializer(read_only=True)
 
     class Meta:
         model = Booking
