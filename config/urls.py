@@ -46,6 +46,7 @@ urlpatterns = [
     path("api/v1/settingsOption", include("settingsOption.urls")),
     path("api/v1/userNotifications", include("userNotifications.urls")),
     path("api/v1/chatrooms", include("chatrooms.urls")),
+    path("api/v1/feedbacks", include("feedbacks.urls")),
     path("api/v1/promotions/", include("promotions.urls")),
     path(
         "api/v1/swagger/schema/",

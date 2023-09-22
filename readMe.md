@@ -3,3 +3,5 @@
 3. IsAuthenticatedOrReadOnly vs IsAuthenticated 유저가 필요한 경우 알아서 로그인 해야한다고 알려줌!
    review 같은경우 읽는건 다가능 리뷰 생성은 로그인 유저만 가능!
 4.
+
+git push origin master 해야함

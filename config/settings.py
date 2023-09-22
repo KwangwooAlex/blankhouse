@@ -78,6 +78,7 @@ CUSTOM_APPS = [
     "direct_messages.apps.DirectMessagesConfig",
     "bookingHistory.apps.BookinghistoryConfig",
     "promotions.apps.PromotionsConfig",
+    "feedbacks.apps.FeedbacksConfig",
     # "products.apps.ProductsConfig",
     # "feedbacks.apps.FeedbacksConfig",
     # "orders.apps.OrdersConfig",
