@@ -183,6 +183,7 @@ class RoomListSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()  # get_rating 메소드이름 정해져있음! 필요로함!
     photos = TinyPhotoInRoomSerializer(many=True, read_only=True)
     category = AddCategorySerializer()
+    owner = TinyUserInRoomSerializer()
 
     is_liked = serializers.SerializerMethodField()
 

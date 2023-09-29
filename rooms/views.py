@@ -41,6 +41,12 @@ from django.db.models import Avg, Sum, Count
                 type=openapi.TYPE_STRING,
             ),
             openapi.Parameter(
+                "owner_name",
+                openapi.IN_QUERY,
+                description="Search by owner name",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
                 "category",
                 openapi.IN_QUERY,
                 description="filter by category / default any",
@@ -135,6 +141,12 @@ class Rooms(GenericAPIView):
         all_rooms = (
             all_rooms.filter(name__contains=request.query_params.get("keyword"))
             if request.query_params.get("keyword")
+            else all_rooms
+        )
+
+        all_rooms = (
+            all_rooms.filter(owner__username=request.query_params.get("owner_name"))
+            if request.query_params.get("owner_name")
             else all_rooms
         )
 
