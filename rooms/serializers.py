@@ -219,6 +219,8 @@ class RoomListSerializer(serializers.ModelSerializer):
             "number_of_bed",
             "maximum_guests",
             "house_type",
+            "country",
+            "city",
         )
 
     # serializers.SerializerMethodField() 커스텀 하기위해 get_rating만들어야함

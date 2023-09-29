@@ -47,6 +47,18 @@ from django.db.models import Avg, Sum, Count
                 type=openapi.TYPE_STRING,
             ),
             openapi.Parameter(
+                "country",
+                openapi.IN_QUERY,
+                description="Search by country",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "city",
+                openapi.IN_QUERY,
+                description="Search by city",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
                 "category",
                 openapi.IN_QUERY,
                 description="filter by category / default any",
@@ -147,6 +159,18 @@ class Rooms(GenericAPIView):
         all_rooms = (
             all_rooms.filter(owner__username=request.query_params.get("owner_name"))
             if request.query_params.get("owner_name")
+            else all_rooms
+        )
+
+        all_rooms = (
+            all_rooms.filter(country__contains=request.query_params.get("country"))
+            if request.query_params.get("country")
+            else all_rooms
+        )
+
+        all_rooms = (
+            all_rooms.filter(city__contains=request.query_params.get("city"))
+            if request.query_params.get("city")
             else all_rooms
         )
 
