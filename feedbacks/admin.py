@@ -19,6 +19,7 @@ class Feedback(admin.ModelAdmin):
 class Answer(admin.ModelAdmin):
     list_display = (
         "pk",
+        "writer",
         "details",
         "feedback",
         "created_at",
